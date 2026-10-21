@@ -55,8 +55,8 @@ H100 and H200; on other devices every op falls back to plain JAX.
     </td>
     <td width="50%" valign="top">
       <b>Fast end to end</b><br>
-      71.8% MFU on one H100 and 68.2% MFU per GPU on 8 H100s for a 1.3B transformer in FP8, and
-      1.02-1.67x flame (FLA's trainer) in bf16 on the same tokens.
+      72.3% MFU on one H100 and 68.2% MFU per GPU on 8 H100s for a 1.3B transformer in FP8, and
+      1.04-1.67x flame (FLA's trainer) in bf16 on the same tokens.
     </td>
   </tr>
 </table>
@@ -68,20 +68,27 @@ H100 and H200; on other devices every op falls back to plain JAX.
   <img src="./assets/kernels-light.png" width="100%" alt="Kernel speedups on one H100, forward and backward, against the latest upstream code named on each row, with the rows where jax-linear-attention is slower shown too.">
 </picture>
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/gdn2-paper-dark.png">
+  <img src="./assets/gdn2-paper-light.png" width="100%" alt="Every 1.3B model of the Gated DeltaNet-2 paper's Figure 2 at 4K x 4 tokens per step on one H100: the paper's numbers against jax-linear-attention's with a 32K and a 128K vocabulary.">
+</picture>
+
 - **[Kernels](https://github.com/jla-org/jax-linear-attention/blob/main/docs/kernels.md):** against
-  the latest upstream code on one H100, forward + backward: Mamba-3 MIMO 3.44-6.09x the official
-  kernels, the Mamba-2 scan 1.20-1.96x, KDA 1.18-1.79x FLA, GLA 1.52-1.77x FLA, Gated DeltaNet
-  1.72-2.68x FLA's Triton kernels.
+  the latest upstream code on one H100, forward + backward: Mamba-3 MIMO 2.70-5.37x the official
+  recurrence kernels, the Mamba-2 scan 1.20-1.96x, KDA 1.47-1.78x FLA, GLA 1.52-1.77x FLA, Gated DeltaNet
+  1.71-2.68x FLA's Triton kernels.
 - **[End to end](https://github.com/jla-org/jax-linear-attention/blob/main/docs/results.md):** 1.3B
-  models against flame on the same tokens: 1.02-1.67x in bf16 and 1.11-1.76x in FP8 against flame's
+  models against flame on the same tokens: 1.04-1.67x in bf16 and 1.10-1.77x in FP8 against flame's
   FP8, and 1.47x flame per GPU for the transformer on 8 H100s.
+- **[In the Gated DeltaNet-2 paper's setting](https://github.com/jla-org/jax-linear-attention/blob/main/benchmarks/gdn2_paper.md):**
+  every 1.3B model of the paper's Figure 2 trains 1.14-1.41x faster on one H100 than the paper reports,
+  with a 32,000-token vocabulary.
 - **[Where we lose](https://github.com/jla-org/jax-linear-attention#where-we-lose):** FlashQLA beats
   our exact Gated DeltaNet split on long single sequences and few-head packed documents, and our
   FA3-style attention runs below FA3. Each case is listed with its numbers and the reason.
 
-Every number comes from one benchmark pass of the release code on a quiet H100 node, with the
-baseline commits and commands in
-[benchmarks/](https://github.com/jla-org/jax-linear-attention/tree/main/benchmarks).
+Every number was measured on H100s with no other jobs on the GPUs; the baseline commits and commands
+are in [benchmarks/](https://github.com/jla-org/jax-linear-attention/tree/main/benchmarks).
 
 ### Open source
 
